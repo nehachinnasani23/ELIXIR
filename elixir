@@ -1,0 +1,43 @@
+defmodule MyApp.Router do
+  use Plug.Router
+
+  plug :match
+  plug :dispatch
+
+  post "/process" do
+    # Retrieve the input value from the request payload
+    input = Jason.decode!(conn.body_params)["input"]
+
+    # Process the input and return the result
+    result = process_input(input)
+
+    # Create a JSON response
+    response = %{result: result} |> Jason.encode!
+
+    # Send the response
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, response)
+  end
+
+  def process_input(input) do
+    # Process the input and return the result
+    # This is just an example - replace this with your own logic
+    "You entered: #{input}"
+  end
+end
+
+defmodule MyApp.Application do
+  use Application
+
+  def start(_type, _args) do
+    children = [
+      # Start the Phoenix endpoint
+      MyApp.Router
+    ]
+
+    # Start the endpoint and the server
+    opts = [strategy: :one_for_one, name: MyApp.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+end
